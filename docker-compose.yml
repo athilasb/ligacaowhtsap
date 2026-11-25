@@ -1,0 +1,9 @@
+services:
+  meowcaller:
+    build: .
+    container_name: meowcaller-teste
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./data:/data   # sessão do WhatsApp (whatsapp.db) — não precisa ler o QR de novo ao reiniciar
+    restart: unless-stopped

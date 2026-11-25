@@ -1,0 +1,6 @@
+meowcaller/.git
+meowcaller/examples
+meowcaller/datasheets
+data
+app/data
+**/*.exe

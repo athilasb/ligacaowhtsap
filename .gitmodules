@@ -1,0 +1,3 @@
+[submodule "meowcaller"]
+	path = meowcaller
+	url = https://github.com/marcosdanielsf/meowcaller.git
