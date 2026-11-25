@@ -1,0 +1,24 @@
+diff --git a/relay/relay.go b/relay/relay.go
+index 0e07142..d35b1d1 100644
+--- a/relay/relay.go
++++ b/relay/relay.go
+@@ -176,10 +176,16 @@ func ConnectRelayMedia(relayAddr *net.UDPAddr, opts ...Option) (*RelayMediaChann
+ 
+ 	// 4. Pre-negotiated DataChannel id=0. LoggerFactory is required: datachannel
+ 	// does not default it and dereferences it on construction.
++	// Real-time RTP must not ride a reliable, ordered SCTP stream: one lost packet
++	// head-of-line blocks everything behind it and, under video load, the association
++	// aborts with "Too many retransmissions". Like whatsapp-rust, use an unordered
++	// channel with maxRetransmits=0 (drop instead of retransmit).
+ 	dc, err := datachannel.Dial(assoc, 0, &datachannel.Config{
+-		Negotiated:    true,
+-		Label:         DataChannelLabel,
+-		LoggerFactory: logging.NewDefaultLoggerFactory(),
++		Negotiated:           true,
++		Label:                DataChannelLabel,
++		ChannelType:          datachannel.ChannelTypePartialReliableRexmitUnordered,
++		ReliabilityParameter: 0,
++		LoggerFactory:        logging.NewDefaultLoggerFactory(),
+ 	})
+ 	if err != nil {
+ 		return fail(fmt.Errorf("datachannel dial: %w", err))

@@ -8,6 +8,13 @@ RUN go mod download
 # código
 WORKDIR /src
 COPY meowcaller/ ./meowcaller/
+# correções nossas no meowcaller (submódulo de terceiros) — ver patches/
+# (normaliza CRLF -> LF antes: checkout no Windows vem com CRLF e os patches são LF)
+COPY patches/ ./patches/
+RUN apk add --no-cache patch dos2unix \
+ && cd meowcaller \
+ && find . -name '*.go' -exec dos2unix -q {} + \
+ && for p in ../patches/*.patch; do patch -p1 -i "$p" || exit 1; done
 COPY app/ ./app/
 WORKDIR /src/app
 RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/server .
